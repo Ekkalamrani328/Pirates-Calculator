@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Kalkulator Armada of Sea - L10.99</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <canvas id="matrix"></canvas>
+
+  <div class="card" role="main">
+    <header>
+      <h1>⚔️ Kalkulator Driver — Armada of Sea</h1>
+      <div class="license">Creator: L10.99</div>
+    </header>
+
+    <div class="grid">
+      <div>
+        <label for="hp">HP NPC</label>
+        <input id="hp" type="number" value="50000" />
+      </div>
+
+      <div>
+        <label for="pearl">Reward per NPC (Pearl)</label>
+        <input id="pearl" type="number" value="318" />
+      </div>
+
+      <div>
+        <label for="gold">Reward per NPC (Gold)</label>
+        <input id="gold" type="number" value="0" />
+      </div>
+
+      <div>
+        <label for="damage">Damage per Tembakan</label>
+        <input id="damage" type="number" value="8000" />
+      </div>
+
+      <div>
+        <label for="ammoPerShot">Ammo per Tembakan</label>
+        <input id="ammoPerShot" type="number" value="134" />
+        <div class="hint">Contoh: setiap tembakan mengurangi 134 ammo</div>
+      </div>
+
+      <div>
+        <label for="totalAmmo">Total Ammo Dimiliki</label>
+        <input id="totalAmmo" type="number" value="2000000000" />
+      </div>
+
+      <div>
+        <label for="tempo">Tempo (detik per tembakan)</label>
+        <input id="tempo" type="number" step="0.1" value="3" />
+      </div>
+
+      <div>
+        <label for="hours">Waktu Bermain (jam)</label>
+        <input id="hours" type="number" step="0.1" value="5" />
+      </div>
+
+      <div class="full">
+        <label for="npcPreset">Pilih NPC Contoh (opsional)</label>
+        <select id="npcPreset">
+          <option value="">-- Pilih NPC --</option>
+          <option value="50000,318,0">NPC 1 — HP 50.000, 318 Pearl</option>
+          <option value="2100000,11950,152000">Lord Dreth — HP 2.100.000, 11.950 Pearl, 152.000 Gold</option>
+          <option value="7000000,0,0">Admiral Dreth — HP 7.000.000</option>
+        </select>
+      </div>
+    </div>
+
+    <button class="btn" onclick="calculate()">Hitung</button>
+
+    <pre id="output" class="output" aria-live="polite">Hasil akan muncul di sini.</pre>
+
+    <div class="footer">
+      License: MIT © 2025 L10.99 | Dibuat untuk penggunaan pribadi & sharing
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
