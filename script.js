@@ -1,57 +1,74 @@
-// Matrix background
+// =====================
+// MATRIX BACKGROUND
+// =====================
 (function () {
   const canvas = document.getElementById("matrix");
   const ctx = canvas.getContext("2d");
-  let W = (canvas.width = window.innerWidth);
-  let H = (canvas.height = window.innerHeight);
-  const size = Math.max(10, Math.floor(Math.min(W, H) / 60));
-  const columns = Math.floor(W / size);
-  const drops = new Array(columns).fill(0);
+  let W, H, size, columns, drops;
   const letters = "01";
+  const dpr = window.devicePixelRatio || 1;
 
   function resize() {
-    W = canvas.width = window.innerWidth;
-    H = canvas.height = window.innerHeight;
+    W = canvas.width = window.innerWidth * dpr;
+    H = canvas.height = window.innerHeight * dpr;
+    ctx.scale(dpr, dpr);
+    size = Math.max(12, Math.floor(Math.min(W / dpr, H / dpr) / 60));
+    columns = Math.floor(W / dpr / size);
+    drops = new Array(columns).fill(0);
   }
-  window.addEventListener("resize", resize);
 
   function draw() {
     ctx.fillStyle = "rgba(0,0,0,0.06)";
     ctx.fillRect(0, 0, W, H);
     ctx.fillStyle = "#00ff66";
     ctx.font = `${size}px monospace`;
+
     for (let i = 0; i < drops.length; i++) {
       const text = letters.charAt(Math.floor(Math.random() * letters.length));
       ctx.fillText(text, i * size, drops[i] * size);
-      if (drops[i] * size > H && Math.random() > 0.975) drops[i] = 0;
+      if (drops[i] * size > H / dpr && Math.random() > 0.975) drops[i] = 0;
       drops[i]++;
     }
     requestAnimationFrame(draw);
   }
+
+  window.addEventListener("resize", resize);
+  resize();
   draw();
 })();
 
-// NPC Preset
-document.getElementById("npcPreset").addEventListener("change", function () {
-  const [hp, pearl, gold] = this.value.split(",").map(Number);
-  if (!hp) return;
-  document.getElementById("hp").value = hp;
+// =====================
+// NPC PRESET
+// =====================
+document.getElementById("npcPreset")?.addEventListener("change", function () {
+  const [hp, pearl, gold] = (this.value || "")
+    .split(",")
+    .map(v => Number(v) || 0);
+
+  if (hp) document.getElementById("hp").value = hp;
   if (pearl) document.getElementById("pearl").value = pearl;
   if (gold) document.getElementById("gold").value = gold;
 });
 
-// Format detik ke jam/menit/detik
+// =====================
+// HELPER: Format Detik
+// =====================
 function formatSeconds(s) {
   s = Math.floor(s);
-  const h = Math.floor(s / 3600); s -= h * 3600;
-  const m = Math.floor(s / 60); s -= m * 60;
+  const h = Math.floor(s / 3600); s %= 3600;
+  const m = Math.floor(s / 60); s %= 60;
+
   if (h > 0) return `${h} jam ${m} menit ${s} detik`;
   if (m > 0) return `${m} menit ${s} detik`;
   return `${s} detik`;
 }
 
-// Hitung
+// =====================
+// HITUNG
+// =====================
 function calculate() {
+  const nf = new Intl.NumberFormat("id-ID");
+
   const hp = Number(document.getElementById("hp").value) || 0;
   const pearl = Number(document.getElementById("pearl").value) || 0;
   const gold = Number(document.getElementById("gold").value) || 0;
@@ -61,18 +78,21 @@ function calculate() {
   const tempo = Number(document.getElementById("tempo").value) || 1;
   const hours = Number(document.getElementById("hours").value) || 0;
 
+  // Perhitungan dasar
   const shotsPerNpc = Math.ceil(hp / damage);
   const ammoPerNpc = shotsPerNpc * ammoPerShot;
   const maxNpcByAmmo = ammoPerNpc > 0 ? Math.floor(totalAmmo / ammoPerNpc) : 0;
+
   const totalSeconds = hours * 3600;
   const secondsPerKill = shotsPerNpc * tempo;
   const maxNpcByTime = secondsPerKill > 0 ? Math.floor(totalSeconds / secondsPerKill) : 0;
-  const totalNpc = Math.min(maxNpcByAmmo, maxNpcByTime);
 
+  const totalNpc = Math.min(maxNpcByAmmo, maxNpcByTime);
   const totalPearl = totalNpc * pearl;
   const totalGold = totalNpc * gold;
   const totalAmmoUsed = totalNpc * ammoPerNpc;
 
+  // Catatan keterbatasan
   let note = "";
   if (maxNpcByAmmo === 0) {
     note = "⚠️ Ammo tidak cukup untuk 1 kill.";
@@ -85,7 +105,7 @@ function calculate() {
     note = `✔️ Ammo & waktu seimbang.`;
   }
 
-  // >>>> Tambahkan mulai di sini <<<<
+  // Catatan efisiensi
   let efficiencyNote = "";
   if (ammoPerNpc > (pearl + gold)) {
     efficiencyNote = "⚠️ Ammo boros dibanding reward.";
@@ -94,25 +114,26 @@ function calculate() {
   } else {
     efficiencyNote = "➖ Seimbang antara ammo & reward.";
   }
-  // >>>> Tambahkan sampai sini <<<<
 
+  // Output
   document.getElementById("output").textContent = `
 📌 NPC
-HP NPC              : ${hp.toLocaleString()}
-Reward per NPC      : ${pearl.toLocaleString()} Pearl, ${gold.toLocaleString()} Gold
+HP NPC              : ${nf.format(hp)}
+Reward per NPC      : ${nf.format(pearl)} Pearl, ${nf.format(gold)} Gold
 
 ⚔️ Pertempuran
-Tembakan dibutuhkan  : ${shotsPerNpc} kali
-Ammo per NPC         : ${ammoPerNpc.toLocaleString()} ammo
+Tembakan dibutuhkan  : ${nf.format(shotsPerNpc)} kali
+Ammo per NPC         : ${nf.format(ammoPerNpc)} ammo
 Waktu per NPC        : ${formatSeconds(secondsPerKill)}
 
 📊 Total
-NPC terbunuh         : ${totalNpc.toLocaleString()}
-Pearl diperoleh      : ${totalPearl.toLocaleString()}
-Gold diperoleh       : ${totalGold.toLocaleString()}
-Ammo terpakai        : ${totalAmmoUsed.toLocaleString()}
+NPC terbunuh         : ${nf.format(totalNpc)}
+Pearl diperoleh      : ${nf.format(totalPearl)}
+Gold diperoleh       : ${nf.format(totalGold)}
+Ammo terpakai        : ${nf.format(totalAmmoUsed)}
 
 ${note}
-${efficiencyNote}   <-- ini hasil tambahan
+${efficiencyNote}
   `;
 }
+
