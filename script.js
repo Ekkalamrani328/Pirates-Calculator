@@ -85,6 +85,17 @@ function calculate() {
     note = `✔️ Ammo & waktu seimbang.`;
   }
 
+  // >>>> Tambahkan mulai di sini <<<<
+  let efficiencyNote = "";
+  if (ammoPerNpc > (pearl + gold)) {
+    efficiencyNote = "⚠️ Ammo boros dibanding reward.";
+  } else if (ammoPerNpc < (pearl + gold) / 2) {
+    efficiencyNote = "💡 Efisien: reward besar dibanding ammo.";
+  } else {
+    efficiencyNote = "➖ Seimbang antara ammo & reward.";
+  }
+  // >>>> Tambahkan sampai sini <<<<
+
   document.getElementById("output").textContent = `
 📌 NPC
 HP NPC              : ${hp.toLocaleString()}
@@ -102,5 +113,6 @@ Gold diperoleh       : ${totalGold.toLocaleString()}
 Ammo terpakai        : ${totalAmmoUsed.toLocaleString()}
 
 ${note}
+${efficiencyNote}   <-- ini hasil tambahan
   `;
 }
